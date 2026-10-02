@@ -1,0 +1,38 @@
+{
+  "name": "speicherling",
+  "version": "1.0.0",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "concurrently -k \"tsx watch src/server/index.ts\" \"vite\"",
+    "build": "tsc -p tsconfig.server.json && tsc -p tsconfig.json --noEmit && vite build",
+    "start": "node dist/server/index.js"
+  },
+  "dependencies": {
+    "@fastify/cookie": "^11.1.2",
+    "@fastify/multipart": "^10.1.2",
+    "@fastify/static": "^10.1.5",
+    "archiver": "^8.0.0",
+    "better-sqlite3": "^13.0.3",
+    "fastify": "^5.12.5",
+    "nodemailer": "^10.0.13"
+  },
+  "devDependencies": {
+    "@types/archiver": "^8.0.0",
+    "@types/better-sqlite3": "^9.6.0",
+    "@types/node": "^26.6.4",
+    "@types/nodemailer": "^8.0.2",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.1.1",
+    "concurrently": "^10.0.5",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.2"
+  }
+}

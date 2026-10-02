@@ -1,0 +1,25 @@
+services:
+  speicherling:
+    build: .
+    ports:
+      - "${PORT:-8080}:8080"
+    environment:
+      PORT: "8080"
+      DATA_DIR: /data
+      AUTH_MODE: ${AUTH_MODE:-otp}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:?Set ADMIN_EMAIL in .env}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
+      SESSION_SECRET: ${SESSION_SECRET:?Set SESSION_SECRET in .env}
+      PUBLIC_URL: ${PUBLIC_URL:-http://localhost:8080}
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASS: ${SMTP_PASS:-}
+      SMTP_FROM: ${SMTP_FROM:-}
+      MAX_UPLOAD_MB: ${MAX_UPLOAD_MB:-200}
+    volumes:
+      - speicherling-data:/data
+    restart: unless-stopped
+
+volumes:
+  speicherling-data:
