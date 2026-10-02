@@ -2,6 +2,7 @@ import { useEffect, useState, type DragEvent, type FormEvent } from "react";
 import { ApiError, api, errorText, uploadForm } from "./api";
 import { FileIcon } from "./FileIcon";
 import { useI18n } from "./i18n";
+import { Preview, type PreviewFile } from "./Preview";
 import { useLocation } from "./route";
 
 type Entry = {
@@ -129,8 +130,10 @@ export function Files() {
   const [renameValue, setRenameValue] = useState("");
   const [confirming, setConfirming] = useState<string | null>(null);
   const [sharePath, setSharePath] = useState<string | null>(null);
+  const [preview, setPreview] = useState<PreviewFile | null>(null);
 
   function openDir(next: string) {
+    setPreview(null);
     const params = new URLSearchParams();
     if (next) params.set("path", next);
     const query = params.toString();
@@ -221,7 +224,7 @@ export function Files() {
 
   return (
     <section
-      className={drag ? "sheet drag" : "sheet"}
+      className={drag ? "sheet files-layout drag" : "sheet files-layout"}
       onDragOver={(event) => {
         event.preventDefault();
         setDrag(true);
@@ -236,6 +239,7 @@ export function Files() {
         void onDrop(event);
       }}
     >
+      <div className="files-main">
       <div className="toolbar">
         <nav className="crumbs" aria-label={t("files")}>
           <button type="button" onClick={() => openDir("")}>
@@ -257,17 +261,19 @@ export function Files() {
           <button type="button" className="ghost" onClick={() => setMakingFolder((value) => !value)}>
             {t("newFolder")}
           </button>
-          <label className="ghost file-pick">
+          <label className="ghost file-pick" htmlFor="file-upload">
             {t("upload")}
-            <input
-              type="file"
-              multiple
-              onChange={(event) => {
-                void onPick(event.target.files);
-                event.target.value = "";
-              }}
-            />
           </label>
+          <input
+            id="file-upload"
+            className="file-input"
+            type="file"
+            multiple
+            onChange={(event) => {
+              void onPick(event.target.files);
+              event.target.value = "";
+            }}
+          />
         </div>
       </div>
       {makingFolder ? (
@@ -284,7 +290,7 @@ export function Files() {
           </button>
         </form>
       ) : null}
-      <div className={drag ? "drop active" : "drop"}>
+      <label htmlFor="file-upload" className={drag ? "drop active" : "drop"}>
         {progress !== null ? (
           <div className="progress">
             <div className="progress-track">
@@ -295,7 +301,7 @@ export function Files() {
         ) : (
           t("dropHint")
         )}
-      </div>
+      </label>
       {error ? <p className="banner">{error}</p> : null}
       {loading ? <p className="muted">{t("loading")}</p> : null}
       {!loading && entries.length === 0 ? <p className="muted">{t("empty")}</p> : null}
@@ -303,7 +309,7 @@ export function Files() {
         {entries.map((entry) => {
           const full = childPath(dir, entry.name);
           return (
-            <li className="file-row" key={full}>
+            <li className={preview?.path === full ? "file-row selected" : "file-row"} key={full}>
               <FileIcon name={entry.name} folder={entry.kind === "folder"} />
               <div className="file-name">
                 {renaming === full ? (
@@ -316,6 +322,7 @@ export function Files() {
                           method: "PATCH",
                           body: JSON.stringify({ path: full, name: renameValue }),
                         });
+                        if (preview?.path === full) setPreview({ path: childPath(dir, renameValue), name: renameValue, size: entry.size });
                         setRenaming(null);
                       });
                     }}
@@ -338,7 +345,9 @@ export function Files() {
                     {entry.name}
                   </button>
                 ) : (
-                  <span>{entry.name}</span>
+                  <button type="button" className="name-button" onClick={() => setPreview({ path: full, name: entry.name, size: entry.size })}>
+                    {entry.name}
+                  </button>
                 )}
                 {entry.shared ? <span className="badge">{t("sharedBadge")}</span> : null}
               </div>
@@ -355,6 +364,7 @@ export function Files() {
                           method: "DELETE",
                           body: JSON.stringify({ path: full }),
                         });
+                        if (preview?.path === full) setPreview(null);
                         setConfirming(null);
                       })
                     }
@@ -400,6 +410,8 @@ export function Files() {
           onChanged={() => void load()}
         />
       ) : null}
+      </div>
+      <Preview file={preview} onClose={() => setPreview(null)} />
     </section>
   );
 }

@@ -37,7 +37,7 @@ Der andere Weg antwortet mit 404.
 
 ## Dateien und Links
 
-Ordner, Hochladen per Button oder Ablegen, auch ganze Ordner aus dem Dateimanager. Beim Hochladen zeigt ein Balken den Fortschritt. Eine einzelne Datei darf höchstens `MAX_UPLOAD_MB` groß sein, voreingestellt 200. Größere Dateien werden abgewiesen. Ein Reverse-Proxy davor muss dieselbe Größe durchlassen. Laden, Umbenennen, Löschen. Ordner lassen sich als Zip laden.
+Ordner, Hochladen per Button, per Klick auf die Ablagefläche oder per Ablegen, auch ganze Ordner aus dem Dateimanager. Beim Hochladen zeigt ein Balken den Fortschritt. Ein Klick auf PDF, Word (.docx), Excel (.xlsx), Bilder, Text, Audio oder Video zeigt die Datei rechts an, höchstens 50 MB. Eine einzelne Datei darf höchstens `MAX_UPLOAD_MB` groß sein, voreingestellt 200. Größere Dateien werden abgewiesen. Ein Reverse-Proxy davor muss dieselbe Größe durchlassen. Laden, Umbenennen, Löschen. Ordner lassen sich als Zip laden.
 
 „Teilen“ erzeugt höchstens einen Link pro Pfad: `/s/` plus ein langer Zufallswert. Eine Datei bietet nur den Download. Ein Ordner ist eine schreibgeschützte Ansicht mit Unterordnern, Download und Zip. Löschen entfernt den Link. Umbenennen behält die URL, der Pfad am Link wird mitgezogen.
 
@@ -85,7 +85,7 @@ cp .env.example .env
 docker compose up -d --build
 ```
 
-Inside the container the app listens on 8080. The host publishes `PORT` from `.env`, 8080 by default. Put your own reverse proxy in front. Data lives in the `speicherling-data` volume. A single file may be up to `MAX_UPLOAD_MB`, 200 by default. The upload shows a progress bar.
+Inside the container the app listens on 8080. The host publishes `PORT` from `.env`, 8080 by default. Put your own reverse proxy in front. Data lives in the `speicherling-data` volume. A single file may be up to `MAX_UPLOAD_MB`, 200 by default. The upload shows a progress bar. Clicking the drop area opens the file chooser. PDF, Word (.docx), Excel (.xlsx), images, text, audio and video open in a preview on the right, up to 50 MB.
 
 Share links are `/s/` plus a random token. Files download. Folders open read-only. The UI is German and English. The version shown in the footer is `version` in `package.json`. A git tag `v1.1.0` that matches that version creates a GitHub release.
 

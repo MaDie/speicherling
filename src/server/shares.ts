@@ -14,6 +14,8 @@ import {
 import {
   contentDisposition,
   createFolder,
+  previewMaxBytes,
+  previewMediaType,
   ensureUserRoot,
   entryKind,
   joinRel,
@@ -134,7 +136,17 @@ export function registerFileRoutes(app: FastifyInstance, ctx: AppCtx) {
     const root = ensureUserRoot(ctx.config.dataDir, user.id);
     const abs = resolveInside(root, rel);
     if (!abs || entryKind(abs) !== "file") return reply.code(404).send({ error: "not_found" });
-    reply.header("Content-Disposition", contentDisposition(path.basename(abs)));
+    const name = path.basename(abs);
+    const inline = (req.query as { inline?: string }).inline === "1";
+    if (inline) {
+      if (statSync(abs).size > previewMaxBytes) return reply.code(413).send({ error: "too_large" });
+      const media = previewMediaType(name);
+      if (!media) return reply.code(400).send({ error: "not_a_file" });
+      reply.header("Content-Disposition", contentDisposition(name, true));
+      reply.type(media);
+      return reply.send(openDownload(abs));
+    }
+    reply.header("Content-Disposition", contentDisposition(name));
     reply.type("application/octet-stream");
     return reply.send(openDownload(abs));
   });

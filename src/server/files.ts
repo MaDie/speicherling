@@ -141,9 +141,60 @@ export function zipDirectory(abs: string, folderName: string) {
   return archive;
 }
 
-export function contentDisposition(filename: string): string {
+export const previewMaxBytes = 50 * 1024 * 1024;
+
+const previewTypes: Record<string, string> = {
+  pdf: "application/pdf",
+  docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  xlsx: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  xlsm: "application/vnd.ms-excel.sheet.macroEnabled.12",
+  png: "image/png",
+  jpg: "image/jpeg",
+  jpeg: "image/jpeg",
+  gif: "image/gif",
+  webp: "image/webp",
+  svg: "image/svg+xml",
+  bmp: "image/bmp",
+  avif: "image/avif",
+  txt: "text/plain; charset=utf-8",
+  md: "text/plain; charset=utf-8",
+  csv: "text/plain; charset=utf-8",
+  json: "text/plain; charset=utf-8",
+  html: "text/plain; charset=utf-8",
+  css: "text/plain; charset=utf-8",
+  js: "text/plain; charset=utf-8",
+  ts: "text/plain; charset=utf-8",
+  tsx: "text/plain; charset=utf-8",
+  jsx: "text/plain; charset=utf-8",
+  py: "text/plain; charset=utf-8",
+  go: "text/plain; charset=utf-8",
+  rs: "text/plain; charset=utf-8",
+  java: "text/plain; charset=utf-8",
+  c: "text/plain; charset=utf-8",
+  cpp: "text/plain; charset=utf-8",
+  sh: "text/plain; charset=utf-8",
+  yml: "text/plain; charset=utf-8",
+  yaml: "text/plain; charset=utf-8",
+  mp3: "audio/mpeg",
+  wav: "audio/wav",
+  ogg: "audio/ogg",
+  m4a: "audio/mp4",
+  aac: "audio/aac",
+  flac: "audio/flac",
+  mp4: "video/mp4",
+  webm: "video/webm",
+  mov: "video/quicktime",
+};
+
+export function previewMediaType(filename: string): string | null {
+  const ext = filename.includes(".") ? filename.slice(filename.lastIndexOf(".") + 1).toLowerCase() : "";
+  return previewTypes[ext] ?? null;
+}
+
+export function contentDisposition(filename: string, inline = false): string {
   const fallback = filename.replace(/[^\w.\- ]+/g, "_") || "download";
-  return `attachment; filename="${fallback}"; filename*=UTF-8''${encodeURIComponent(filename)}`;
+  const kind = inline ? "inline" : "attachment";
+  return `${kind}; filename="${fallback}"; filename*=UTF-8''${encodeURIComponent(filename)}`;
 }
 
 export function entryKind(abs: string): "file" | "folder" | null {
