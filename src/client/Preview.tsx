@@ -23,6 +23,20 @@ function previewUrl(path: string): string {
   return `/api/download?path=${encodeURIComponent(path)}&inline=1`;
 }
 
+function downloadUrl(path: string): string {
+  return `/api/download?path=${encodeURIComponent(path)}`;
+}
+
+function DownloadIcon() {
+  return (
+    <svg className="download-icon" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M12 4v10" />
+      <path d="M8 10l4 4 4-4" />
+      <path d="M5 19h14" />
+    </svg>
+  );
+}
+
 export function Preview({ file, onClose }: { file: PreviewFile | null; onClose: () => void }) {
   const { t } = useI18n();
   const kind = file ? previewKind(file.name) : null;
@@ -31,29 +45,38 @@ export function Preview({ file, onClose }: { file: PreviewFile | null; onClose: 
   return (
     <aside className={file ? "preview-pane open" : "preview-pane"} aria-label={t("preview")}>
       <div className="preview-head">
-        <h2>{file ? file.name : t("preview")}</h2>
+        <div className="preview-title">
+          {file ? (
+            <a className="preview-download" href={downloadUrl(file.path)} aria-label={t("download")}>
+              <DownloadIcon />
+            </a>
+          ) : null}
+          <h2>{file ? file.name : t("preview")}</h2>
+        </div>
         {file ? (
           <button type="button" className="ghost" onClick={onClose}>
             {t("close")}
           </button>
         ) : null}
       </div>
-      {!file ? <p className="muted">{t("previewEmpty")}</p> : null}
-      {file && !kind ? <p className="muted">{t("previewUnsupported")}</p> : null}
-      {file && kind && tooLarge ? <p className="muted">{t("previewTooLarge")}</p> : null}
-      {file && kind === "pdf" && !tooLarge ? (
-        <iframe className="preview-frame" title={file.name} src={previewUrl(file.path)} />
-      ) : null}
-      {file && kind === "image" && !tooLarge ? <ImagePreview key={file.path} path={file.path} name={file.name} /> : null}
-      {file && kind === "text" && !tooLarge ? <TextPreview key={file.path} path={file.path} /> : null}
-      {file && kind === "audio" && !tooLarge ? (
-        <audio key={file.path} className="preview-media" controls src={previewUrl(file.path)} />
-      ) : null}
-      {file && kind === "video" && !tooLarge ? (
-        <video key={file.path} className="preview-media" controls src={previewUrl(file.path)} />
-      ) : null}
-      {file && kind === "docx" && !tooLarge ? <DocxPreview path={file.path} /> : null}
-      {file && kind === "sheet" && !tooLarge ? <SheetPreview path={file.path} /> : null}
+      <div className="preview-stage">
+        {!file ? <p className="muted">{t("previewEmpty")}</p> : null}
+        {file && !kind ? <p className="muted">{t("previewUnsupported")}</p> : null}
+        {file && kind && tooLarge ? <p className="muted">{t("previewTooLarge")}</p> : null}
+        {file && kind === "pdf" && !tooLarge ? (
+          <iframe className="preview-frame" title={file.name} src={previewUrl(file.path)} />
+        ) : null}
+        {file && kind === "image" && !tooLarge ? <ImagePreview key={file.path} path={file.path} name={file.name} /> : null}
+        {file && kind === "text" && !tooLarge ? <TextPreview key={file.path} path={file.path} /> : null}
+        {file && kind === "audio" && !tooLarge ? (
+          <audio key={file.path} className="preview-media" controls src={previewUrl(file.path)} />
+        ) : null}
+        {file && kind === "video" && !tooLarge ? (
+          <video key={file.path} className="preview-media" controls src={previewUrl(file.path)} />
+        ) : null}
+        {file && kind === "docx" && !tooLarge ? <DocxPreview path={file.path} /> : null}
+        {file && kind === "sheet" && !tooLarge ? <SheetPreview path={file.path} /> : null}
+      </div>
     </aside>
   );
 }
